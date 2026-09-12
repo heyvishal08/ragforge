@@ -27,7 +27,7 @@ coverage.xml
 # ─── Node ───
 node_modules/
 .next/
-out/
+!frontend/out/
 .turbo/
 *.tsbuildinfo
 next-env.d.ts

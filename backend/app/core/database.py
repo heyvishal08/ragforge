@@ -48,11 +48,13 @@ async def get_db() -> AsyncSession:
 
 async def run_migrations():
     """Create all tables on startup (dev convenience). Use Alembic in production."""
-    async with engine.begin() as conn:
-        try:
+    try:
+        async with engine.begin() as conn:
             await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
-        except Exception:
-            pass
+    except Exception:
+        pass
+
+    async with engine.begin() as conn:
         # Import all models so they are registered with Base.metadata
         import app.models  # noqa: F401
         await conn.run_sync(Base.metadata.create_all)

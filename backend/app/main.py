@@ -17,10 +17,16 @@ from app.api import documents, knowledge_bases, chat, retrieval, evaluations, an
 logger = structlog.get_logger()
 
 
+import os
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application startup and shutdown lifecycle."""
     logger.info("Starting RAGForge backend", version="0.1.0")
+    os.makedirs(settings.upload_dir, exist_ok=True)
+    os.makedirs("data/temp", exist_ok=True)
     await run_migrations()
     yield
     await engine.dispose()
@@ -55,3 +61,16 @@ app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"]
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "ragforge"}
+
+
+# ─── Static Frontend (Next.js Export) ───
+frontend_dirs = [
+    Path(__file__).resolve().parents[2] / "frontend" / "out",
+    Path("frontend/out"),
+    Path("out"),
+]
+for f_dir in frontend_dirs:
+    if f_dir.exists():
+        app.mount("/", StaticFiles(directory=str(f_dir), html=True), name="frontend")
+        break
+
