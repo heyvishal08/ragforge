@@ -1,0 +1,49 @@
+quarter,product,region,revenue,units_sold,cost,profit,growth_pct,customer_segment
+Q1 2024,TechCloud Pro,North America,4250000,8500,2125000,2125000,18.5,Enterprise
+Q1 2024,TechCloud Pro,Europe,2870000,5740,1435000,1435000,22.1,Enterprise
+Q1 2024,TechCloud Pro,Asia Pacific,1950000,3900,975000,975000,31.4,Enterprise
+Q1 2024,TechCloud Starter,North America,890000,17800,445000,445000,12.3,SMB
+Q1 2024,TechCloud Starter,Europe,620000,12400,310000,310000,15.7,SMB
+Q1 2024,TechCloud Starter,Asia Pacific,430000,8600,215000,215000,28.9,SMB
+Q1 2024,AI Assist Pro,North America,1560000,31200,468000,1092000,45.2,Enterprise
+Q1 2024,AI Assist Pro,Europe,980000,19600,294000,686000,38.7,Enterprise
+Q1 2024,AI Assist Pro,Asia Pacific,720000,14400,216000,504000,52.1,Enterprise
+Q1 2024,Enterprise Suite,North America,3200000,6400,1920000,1280000,8.4,Enterprise
+Q1 2024,Enterprise Suite,Europe,2100000,4200,1260000,840000,6.9,Enterprise
+Q1 2024,Enterprise Suite,Asia Pacific,1400000,2800,840000,560000,14.2,Enterprise
+Q2 2024,TechCloud Pro,North America,4580000,9160,2290000,2290000,20.1,Enterprise
+Q2 2024,TechCloud Pro,Europe,3120000,6240,1560000,1560000,24.8,Enterprise
+Q2 2024,TechCloud Pro,Asia Pacific,2180000,4360,1090000,1090000,34.2,Enterprise
+Q2 2024,TechCloud Starter,North America,960000,19200,480000,480000,14.1,SMB
+Q2 2024,TechCloud Starter,Europe,680000,13600,340000,340000,17.3,SMB
+Q2 2024,TechCloud Starter,Asia Pacific,490000,9800,245000,245000,32.1,SMB
+Q2 2024,AI Assist Pro,North America,1820000,36400,546000,1274000,51.3,Enterprise
+Q2 2024,AI Assist Pro,Europe,1150000,23000,345000,805000,42.8,Enterprise
+Q2 2024,AI Assist Pro,Asia Pacific,870000,17400,261000,609000,58.4,Enterprise
+Q2 2024,Enterprise Suite,North America,3350000,6700,2010000,1340000,9.1,Enterprise
+Q2 2024,Enterprise Suite,Europe,2200000,4400,1320000,880000,7.8,Enterprise
+Q2 2024,Enterprise Suite,Asia Pacific,1520000,3040,912000,608000,16.1,Enterprise
+Q3 2024,TechCloud Pro,North America,4890000,9780,2445000,2445000,22.4,Enterprise
+Q3 2024,TechCloud Pro,Europe,3380000,6760,1690000,1690000,27.1,Enterprise
+Q3 2024,TechCloud Pro,Asia Pacific,2420000,4840,1210000,1210000,37.8,Enterprise
+Q3 2024,TechCloud Starter,North America,1040000,20800,520000,520000,15.8,SMB
+Q3 2024,TechCloud Starter,Europe,740000,14800,370000,370000,19.2,SMB
+Q3 2024,TechCloud Starter,Asia Pacific,560000,11200,280000,280000,35.7,SMB
+Q3 2024,AI Assist Pro,North America,2100000,42000,630000,1470000,56.8,Enterprise
+Q3 2024,AI Assist Pro,Europe,1340000,26800,402000,938000,47.3,Enterprise
+Q3 2024,AI Assist Pro,Asia Pacific,1020000,20400,306000,714000,63.2,Enterprise
+Q3 2024,Enterprise Suite,North America,3480000,6960,2088000,1392000,10.2,Enterprise
+Q3 2024,Enterprise Suite,Europe,2310000,4620,1386000,924000,8.5,Enterprise
+Q3 2024,Enterprise Suite,Asia Pacific,1650000,3300,990000,660000,18.4,Enterprise
+Q4 2024,TechCloud Pro,North America,5240000,10480,2620000,2620000,25.1,Enterprise
+Q4 2024,TechCloud Pro,Europe,3650000,7300,1825000,1825000,29.8,Enterprise
+Q4 2024,TechCloud Pro,Asia Pacific,2700000,5400,1350000,1350000,41.2,Enterprise
+Q4 2024,TechCloud Starter,North America,1130000,22600,565000,565000,17.4,SMB
+Q4 2024,TechCloud Starter,Europe,810000,16200,405000,405000,21.1,SMB
+Q4 2024,TechCloud Starter,Asia Pacific,640000,12800,320000,320000,38.9,SMB
+Q4 2024,AI Assist Pro,North America,2420000,48400,726000,1694000,62.1,Enterprise
+Q4 2024,AI Assist Pro,Europe,1560000,31200,468000,1092000,52.4,Enterprise
+Q4 2024,AI Assist Pro,Asia Pacific,1200000,24000,360000,840000,68.7,Enterprise
+Q4 2024,Enterprise Suite,North America,3620000,7240,2172000,1448000,11.3,Enterprise
+Q4 2024,Enterprise Suite,Europe,2430000,4860,1458000,972000,9.7,Enterprise
+Q4 2024,Enterprise Suite,Asia Pacific,1790000,3580,1074000,716000,20.1,Enterprise
