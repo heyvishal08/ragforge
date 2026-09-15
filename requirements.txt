@@ -23,7 +23,6 @@ tiktoken==0.8.0
 # ─── AI / ML ───
 groq==0.15.0
 sentence-transformers==3.4.1
-torch==2.5.1
 transformers==4.47.1
 
 # ─── Utilities ───

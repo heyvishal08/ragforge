@@ -5,6 +5,7 @@ colorFrom: indigo
 colorTo: purple
 sdk: gradio
 app_file: app.py
+suggested_hardware: cpu-basic
 ---
 
 # RAGForge — Evidence-First AI Knowledge Engine
