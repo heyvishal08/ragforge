@@ -9,6 +9,12 @@ import os
 import sys
 from pathlib import Path
 
+# Initialize spaces module first if on ZeroGPU
+try:
+    import spaces
+except Exception:
+    pass
+
 # Add backend directory to sys.path
 backend_path = Path(__file__).resolve().parent / "backend"
 sys.path.insert(0, str(backend_path))
