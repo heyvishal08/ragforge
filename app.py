@@ -30,19 +30,6 @@ finally:
 
 import uvicorn
 
-# Mount Gradio sub-app on /gradio if gradio is installed (ensures HF health checks pass)
-try:
-    import gradio as gr
-
-    with gr.Blocks(title="RAGForge Engine") as demo:
-        gr.Markdown(
-            "# ⚡ RAGForge Engine is Live\n\n"
-            "The full UI is running at the root URL [`/`](/)."
-        )
-    app = gr.mount_gradio_app(app, demo, path="/gradio")
-except Exception:
-    pass
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 7860))
     uvicorn.run(app, host="0.0.0.0", port=port)
