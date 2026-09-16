@@ -12,11 +12,6 @@ from pathlib import Path
 # Initialize spaces module first if on ZeroGPU
 try:
     import spaces
-
-    @spaces.GPU(duration=1)
-    def dummy_gpu_func():
-        """Satisfies Hugging Face ZeroGPU startup scanner."""
-        return None
 except Exception:
     pass
 
@@ -34,6 +29,23 @@ finally:
         sys.modules["__space_app__"] = current_app_module
 
 import uvicorn
+
+# Bind a ZeroGPU function to a Gradio event listener with ssr_mode=False (prevents port 7861 SSR)
+try:
+    import gradio as gr
+
+    @spaces.GPU(duration=1)
+    def zero_gpu_task(prompt):
+        return prompt
+
+    with gr.Blocks(title="RAGForge Engine") as demo:
+        txt = gr.Textbox(visible=False)
+        btn = gr.Button(visible=False)
+        btn.click(fn=zero_gpu_task, inputs=txt, outputs=txt)
+
+    app = gr.mount_gradio_app(app, demo, path="/gradio", ssr_mode=False)
+except Exception:
+    pass
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 7860))
