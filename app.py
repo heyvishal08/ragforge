@@ -12,6 +12,11 @@ from pathlib import Path
 # Initialize spaces module first if on ZeroGPU
 try:
     import spaces
+
+    @spaces.GPU(duration=1)
+    def dummy_gpu_func():
+        """Satisfies Hugging Face ZeroGPU startup scanner."""
+        return None
 except Exception:
     pass
 
