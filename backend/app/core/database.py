@@ -8,10 +8,32 @@ from sqlalchemy.orm import DeclarativeBase
 
 from app.core.config import settings
 
-# Asyncpg expects ?ssl=require rather than ?sslmode=require
-db_url = settings.database_url
-if "sslmode=" in db_url:
-    db_url = db_url.replace("sslmode=require", "ssl=require").replace("sslmode=prefer", "ssl=prefer")
+from sqlalchemy.engine.url import make_url
+
+def normalize_asyncpg_url(raw_url: str) -> str:
+    """Normalize database URL for asyncpg by stripping unsupported query parameters like channel_binding."""
+    try:
+        url = make_url(raw_url)
+        supported_params = {
+            "ssl", "timeout", "command_timeout", "statement_cache_size",
+            "max_cached_statement_lifetime", "max_cacheable_statement_size",
+            "server_settings", "target_session_attrs"
+        }
+        query = dict(url.query)
+        if "sslmode" in query:
+            val = query.pop("sslmode")
+            if val in ("require", "verify-ca", "verify-full"):
+                query["ssl"] = "require"
+            elif val == "prefer":
+                query["ssl"] = "prefer"
+        filtered_query = {k: v for k, v in query.items() if k in supported_params}
+        if "localhost" not in (url.host or "") and "127.0.0.1" not in (url.host or "") and "ssl" not in filtered_query:
+            filtered_query["ssl"] = "require"
+        return url._replace(query=filtered_query).render_as_string(hide_password=False)
+    except Exception:
+        return raw_url
+
+db_url = normalize_asyncpg_url(settings.database_url)
 
 engine = create_async_engine(
     db_url,
