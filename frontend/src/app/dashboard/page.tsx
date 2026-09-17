@@ -25,32 +25,53 @@ export default function DashboardPage() {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [takingLonger, setTakingLonger] = useState(false);
+
+  const fetchData = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const [analyticsData, kbData] = await Promise.all([
+        api.get<AnalyticsSummary>("/analytics/summary"),
+        api.get<KnowledgeBase[]>("/knowledge-bases"),
+      ]);
+      setAnalytics(analyticsData);
+      setKnowledgeBases(kbData);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Backend is currently waking up or unreachable"
+      );
+    } finally {
+      setLoading(false);
+      setTakingLonger(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [analyticsData, kbData] = await Promise.all([
-          api.get<AnalyticsSummary>("/analytics/summary"),
-          api.get<KnowledgeBase[]>("/knowledge-bases"),
-        ]);
-        setAnalytics(analyticsData);
-        setKnowledgeBases(kbData);
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Failed to load dashboard data");
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchData();
+    const timer = setTimeout(() => {
+      setTakingLonger(true);
+    }, 4000);
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="flex items-center gap-3 text-slate-400">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-center px-4">
+        <div className="flex items-center gap-3 text-slate-300">
           <Zap className="w-5 h-5 animate-pulse text-indigo-400" />
-          <span className="text-sm font-medium">Loading workspace metrics...</span>
+          <span className="text-sm font-semibold">Loading workspace metrics...</span>
         </div>
+        {takingLonger && (
+          <div className="max-w-md p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 animate-fade-in">
+            <p className="font-medium mb-1">⚡ Waking up backend engine</p>
+            <p className="text-slate-400 leading-relaxed">
+              The free cloud instance on Render spins down when inactive. Waking it up takes ~30–45 seconds on initial load. Subsequent requests are instant.
+            </p>
+          </div>
+        )}
       </div>
     );
   }
@@ -116,9 +137,17 @@ export default function DashboardPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-3 text-rose-300 text-sm">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span>{error} — Verify that your backend is active at http://localhost:8000</span>
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-rose-300 text-sm">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <button
+            onClick={fetchData}
+            className="self-start sm:self-auto px-4 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 text-xs font-semibold transition-colors"
+          >
+            Retry Connection
+          </button>
         </div>
       )}
 
