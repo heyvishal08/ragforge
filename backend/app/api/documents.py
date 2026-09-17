@@ -228,7 +228,11 @@ async def get_document_chunks(doc_id: uuid.UUID, db: AsyncSession = Depends(get_
 
 @router.delete("/{doc_id}", status_code=204)
 async def delete_document(doc_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
-    """Delete a document and all its chunks."""
+    """Delete a document and all its chunks and citations."""
+    from app.models.document_chunk import DocumentChunk
+    from app.models.citation import Citation
+    from sqlalchemy import delete
+    
     result = await db.execute(select(Document).where(Document.id == doc_id))
     doc = result.scalar_one_or_none()
     if not doc:
@@ -242,5 +246,19 @@ async def delete_document(doc_id: uuid.UUID, db: AsyncSession = Depends(get_db))
         except OSError:
             pass
     
-    await db.delete(doc)
-    await db.commit()
+    try:
+        # 1. Delete citations referencing any chunks belonging to this document
+        chunk_subquery = select(DocumentChunk.id).where(DocumentChunk.document_id == doc_id)
+        await db.execute(delete(Citation).where(Citation.chunk_id.in_(chunk_subquery)))
+        
+        # 2. Delete all chunks belonging to this document
+        await db.execute(delete(DocumentChunk).where(DocumentChunk.document_id == doc_id))
+        
+        # 3. Delete the document itself
+        await db.execute(delete(Document).where(Document.id == doc_id))
+        
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error("Failed to delete document", doc_id=str(doc_id), error=str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to delete document: {str(e)}")

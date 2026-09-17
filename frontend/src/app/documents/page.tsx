@@ -122,12 +122,17 @@ function DocumentsContent() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this document and all indexed chunks?")) return;
-    await api.delete(`/documents/${id}`);
-    if (selectedDoc?.id === id) {
-      setSelectedDoc(null);
-      setChunks([]);
+    try {
+      await api.delete(`/documents/${id}`);
+      if (selectedDoc?.id === id) {
+        setSelectedDoc(null);
+        setChunks([]);
+      }
+      await fetchDocs();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to delete document";
+      alert(`Delete error: ${msg}`);
     }
-    fetchDocs();
   };
 
   const viewChunks = async (doc: DocType) => {

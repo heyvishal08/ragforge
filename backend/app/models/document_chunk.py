@@ -36,7 +36,9 @@ class DocumentChunk(Base):
 
     # Relationships
     document = relationship("Document", back_populates="chunks")
-    citations = relationship("Citation", back_populates="chunk")
+    citations = relationship(
+        "Citation", back_populates="chunk", cascade="all, delete-orphan", passive_deletes=True
+    )
 
     __table_args__ = (
         Index("ix_chunks_document_id", "document_id"),
