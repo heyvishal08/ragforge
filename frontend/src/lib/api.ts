@@ -12,13 +12,15 @@ class ApiClient {
   }
 
   private getEffectiveBaseUrl(): string {
-    if (this.baseUrl && this.baseUrl.startsWith("http")) {
-      return this.baseUrl;
+    let url = this.baseUrl;
+    if (!url || !url.startsWith("http")) {
+      if (typeof window !== "undefined") {
+        url = `${window.location.origin}${this.baseUrl}`;
+      } else {
+        url = `http://127.0.0.1:8000${this.baseUrl}`;
+      }
     }
-    if (typeof window !== "undefined") {
-      return `${window.location.origin}${this.baseUrl}`;
-    }
-    return `http://127.0.0.1:8000${this.baseUrl}`;
+    return url.replace(/\/+$/, "");
   }
 
   private buildUrl(path: string, params?: Record<string, string>): string {
