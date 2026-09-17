@@ -96,7 +96,33 @@ class RAGPipeline:
         
         query_type = self.router.classify(query, has_csv=has_csv, document_count=doc_count)
         
-        # ─── 2. Retrieval ───
+        # ─── 2. Check KB Chunk Count & Retrieval ───
+        from app.models.document_chunk import DocumentChunk
+        chunk_count_res = await self.db.execute(
+            select(func.count(DocumentChunk.id))
+            .join(Document, Document.id == DocumentChunk.document_id)
+            .where(Document.knowledge_base_id == knowledge_base_id)
+        )
+        total_chunks = chunk_count_res.scalar() or 0
+        if total_chunks == 0:
+            timings["total_ms"] = round((time.perf_counter() - total_start) * 1000, 2)
+            return {
+                "answer": "No indexed document chunks found in this knowledge base yet. If you recently uploaded a document, please check the Documents tab to verify it is marked 'READY' or try re-uploading it.",
+                "citations": [],
+                "retrieval_metadata": {
+                    "query_type": query_type,
+                    "retrieval_strategy": retrieval_strategy,
+                    "retrieved_candidates": 0,
+                    "reranked_candidates": 0,
+                    "final_evidence_count": 0,
+                    "timings": timings,
+                    "insufficient_evidence": True,
+                },
+                "confidence": {"evidence_confidence": 0, "evidence_quality": 0, "retrieval_coverage": 0},
+                "total_latency_ms": timings.get("total_ms", 0),
+                "token_count": 0,
+            }
+
         retrieval_start = time.perf_counter()
         
         # Embed query
@@ -131,9 +157,6 @@ class RAGPipeline:
             return self._insufficient_evidence(query, knowledge_base_id, timings)
         
         # Check minimum evidence quality:
-        # Cross-encoder outputs unnormalized logits (-15 to +15).
-        # Summary and broad queries target the document as a whole rather than a narrow passage,
-        # so we shouldn't discard valid retrieved candidates.
         query_lower = query.lower()
         is_summary_query = any(k in query_lower for k in [
             "summarize", "summary", "overview", "what is this", "explain this",
@@ -145,12 +168,11 @@ class RAGPipeline:
             rerank_score = top_candidate.get("rerank_score")
             raw_score = top_candidate.get("score", 0)
             
-            # If cross-encoder scored it, a logit < -12 indicates total disconnect
-            if rerank_score is not None:
+            if settings.reranker_provider == "cross-encoder" and rerank_score is not None:
                 if rerank_score < -12.0 and raw_score < 0.001:
                     timings["total_ms"] = round((time.perf_counter() - total_start) * 1000, 2)
                     return self._insufficient_evidence(query, knowledge_base_id, timings)
-            elif raw_score < settings.min_evidence_threshold:
+            elif raw_score < 0.005:
                 timings["total_ms"] = round((time.perf_counter() - total_start) * 1000, 2)
                 return self._insufficient_evidence(query, knowledge_base_id, timings)
         

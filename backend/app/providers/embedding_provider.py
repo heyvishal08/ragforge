@@ -36,22 +36,39 @@ class EmbeddingProvider(ABC):
 
 
 class SentenceTransformerProvider(EmbeddingProvider):
-    """Local sentence-transformers embedding provider."""
+    """Local sentence-transformers embedding provider optimized for 512MB RAM cloud containers."""
     
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+        import gc
+        import torch
+        # Cap PyTorch thread count to prevent multi-threaded memory bloat on 512MB RAM
+        torch.set_num_threads(1)
+        torch.set_num_interop_threads(1)
+        torch.set_grad_enabled(False)
+        
         from sentence_transformers import SentenceTransformer
         
         logger.info("Loading embedding model", model=model_name)
         self.model = SentenceTransformer(model_name)
+        self.model.eval()
         self._dimension = self.model.get_sentence_embedding_dimension()
+        gc.collect()
         logger.info("Embedding model loaded", model=model_name, dimension=self._dimension)
     
     def embed(self, text: str) -> list[float]:
-        embedding = self.model.encode(text, normalize_embeddings=True)
+        import torch
+        with torch.no_grad():
+            embedding = self.model.encode(text, normalize_embeddings=True, show_progress_bar=False)
         return embedding.tolist()
     
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        embeddings = self.model.encode(texts, normalize_embeddings=True, batch_size=32)
+        import gc
+        import torch
+        with torch.no_grad():
+            embeddings = self.model.encode(
+                texts, normalize_embeddings=True, batch_size=16, show_progress_bar=False
+            )
+        gc.collect()
         return embeddings.tolist()
     
     @property

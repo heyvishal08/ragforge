@@ -61,10 +61,13 @@ class CrossEncoderReranker(Reranker):
 
 
 class NoOpReranker(Reranker):
-    """Pass-through reranker that does no reranking (for comparison)."""
+    """Pass-through reranker that preserves Hybrid Search RRF scores without loading heavy CrossEncoder."""
     
     async def rerank(self, query: str, results: list[dict], top_k: int = None) -> list[dict]:
         top_k = top_k or settings.rerank_top_k
+        for r in results:
+            if "rerank_score" not in r:
+                r["rerank_score"] = float(r.get("score", 0.0))
         return results[:top_k]
 
 

@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     embedding_dimension: int = 384
 
     # ─── Reranker ───
-    reranker_provider: str = "cross-encoder"
+    reranker_provider: str = "none"
     reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 
     # ─── Application ───

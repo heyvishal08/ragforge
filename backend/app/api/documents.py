@@ -91,8 +91,12 @@ async def upload_document(
     await db.commit()
     await db.refresh(doc)
     
-    # Trigger background processing
-    background_tasks.add_task(process_document, str(doc.id), file_path)
+    # Process small documents (< 5MB) directly so they are immediately READY
+    if file_size <= 5 * 1024 * 1024:
+        await process_document(str(doc.id), file_path)
+        await db.refresh(doc)
+    else:
+        background_tasks.add_task(process_document, str(doc.id), file_path)
     
     return DocumentResponse(
         id=doc.id,
@@ -233,6 +237,10 @@ async def delete_document(doc_id: uuid.UUID, db: AsyncSession = Depends(get_db))
     # Delete file from disk
     file_path = (doc.metadata_ or {}).get("file_path")
     if file_path and os.path.exists(file_path):
-        os.remove(file_path)
+        try:
+            os.remove(file_path)
+        except OSError:
+            pass
     
     await db.delete(doc)
+    await db.commit()
