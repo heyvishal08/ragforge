@@ -162,6 +162,7 @@ function ChatContent() {
     setInput("");
     setLoading(true);
 
+    let assistantContent = "";
     try {
       const response = await fetch(`${api.base}/chat`, {
         method: "POST",
@@ -178,7 +179,6 @@ function ChatContent() {
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      let assistantContent = "";
       let assistantCitations: Citation[] = [];
       let retrievalMeta: RetrievalMetadata | null = null;
       let confidence: Confidence | null = null;
@@ -231,21 +231,30 @@ function ChatContent() {
                       : m
                   )
                 );
+              } else if (data.type === "error") {
+                assistantContent = data.error || "An error occurred during retrieval.";
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId ? { ...m, content: assistantContent } : m
+                  )
+                );
               }
             } catch {}
           }
         }
       }
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 2).toString(),
-          role: "assistant",
-          content:
-            "I couldn't complete retrieval for this request. Please ensure the backend is running and documents are indexed.",
-        },
-      ]);
+      if (!assistantContent) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 2).toString(),
+            role: "assistant",
+            content:
+              "Unable to complete retrieval. If the backend is waking up from sleep, please allow ~20 seconds and try again.",
+          },
+        ]);
+      }
     } finally {
       setLoading(false);
     }

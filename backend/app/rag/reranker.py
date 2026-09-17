@@ -77,10 +77,12 @@ def get_reranker() -> Reranker:
     
     if _reranker is None:
         if settings.reranker_provider == "cross-encoder":
-            _reranker = CrossEncoderReranker(settings.reranker_model)
-        elif settings.reranker_provider == "none":
-            _reranker = NoOpReranker()
+            try:
+                _reranker = CrossEncoderReranker(settings.reranker_model)
+            except Exception as e:
+                logger.warning("Failed to initialize CrossEncoder; falling back to NoOpReranker", error=str(e))
+                _reranker = NoOpReranker()
         else:
-            raise ValueError(f"Unknown reranker provider: {settings.reranker_provider}")
+            _reranker = NoOpReranker()
     
     return _reranker

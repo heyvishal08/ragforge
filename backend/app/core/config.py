@@ -19,8 +19,8 @@ class Settings(BaseSettings):
     groq_model: str = "qwen/qwen3.8-27b"
 
     # ─── Embedding ───
-    embedding_provider: str = "sentence-transformer"
-    embedding_model: str = "all-MiniLM-L6-v2"
+    embedding_provider: str = "fastembed"
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     embedding_dimension: int = 384
 
     # ─── Reranker ───
