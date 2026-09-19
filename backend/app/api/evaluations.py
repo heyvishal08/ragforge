@@ -9,6 +9,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db, async_session
+from app.core.workspace import get_current_workspace
+from app.models.workspace import Workspace
 from app.models.evaluation import EvaluationRun, EvaluationQuestion
 from app.models.knowledge_base import KnowledgeBase
 from app.schemas import EvaluationRunCreate, EvaluationRunResponse
@@ -22,15 +24,19 @@ router = APIRouter()
 async def create_evaluation(
     data: EvaluationRunCreate,
     background_tasks: BackgroundTasks,
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     """Create and start an evaluation run."""
-    # Validate KB
+    # Validate KB belongs to current workspace
     result = await db.execute(
-        select(KnowledgeBase).where(KnowledgeBase.id == data.knowledge_base_id)
+        select(KnowledgeBase).where(
+            KnowledgeBase.id == data.knowledge_base_id,
+            KnowledgeBase.workspace_id == workspace.id,
+        )
     )
     if not result.scalar_one_or_none():
-        raise HTTPException(status_code=404, detail="Knowledge base not found")
+        raise HTTPException(status_code=404, detail="Knowledge base not found in your workspace")
     
     run = EvaluationRun(
         knowledge_base_id=data.knowledge_base_id,
@@ -87,10 +93,16 @@ async def run_evaluation(run_id: str):
 @router.get("", response_model=List[EvaluationRunResponse])
 async def list_evaluations(
     knowledge_base_id: uuid.UUID = None,
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    """List evaluation runs."""
-    query = select(EvaluationRun).order_by(EvaluationRun.created_at.desc())
+    """List evaluation runs scoped to the current visitor's workspace."""
+    query = (
+        select(EvaluationRun)
+        .join(KnowledgeBase, KnowledgeBase.id == EvaluationRun.knowledge_base_id)
+        .where(KnowledgeBase.workspace_id == workspace.id)
+        .order_by(EvaluationRun.created_at.desc())
+    )
     if knowledge_base_id:
         query = query.where(EvaluationRun.knowledge_base_id == knowledge_base_id)
     
@@ -100,10 +112,16 @@ async def list_evaluations(
 
 
 @router.get("/{run_id}", response_model=EvaluationRunResponse)
-async def get_evaluation(run_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
-    """Get evaluation run details."""
+async def get_evaluation(
+    run_id: uuid.UUID,
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get evaluation run details scoped to the current workspace."""
     result = await db.execute(
-        select(EvaluationRun).where(EvaluationRun.id == run_id)
+        select(EvaluationRun)
+        .join(KnowledgeBase, KnowledgeBase.id == EvaluationRun.knowledge_base_id)
+        .where(EvaluationRun.id == run_id, KnowledgeBase.workspace_id == workspace.id)
     )
     run = result.scalar_one_or_none()
     if not run:

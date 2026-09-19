@@ -13,6 +13,8 @@ from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
 from app.core.database import get_db, async_session
+from app.core.workspace import get_current_workspace
+from app.models.workspace import Workspace
 from app.models.document import Document
 from app.models.document_chunk import DocumentChunk
 from app.models.knowledge_base import KnowledgeBase
@@ -39,16 +41,20 @@ async def upload_document(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     knowledge_base_id: uuid.UUID = Form(...),
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     """Upload a document to a knowledge base for processing."""
-    # Validate knowledge base exists
+    # Validate knowledge base exists and belongs to this workspace
     result = await db.execute(
-        select(KnowledgeBase).where(KnowledgeBase.id == knowledge_base_id)
+        select(KnowledgeBase).where(
+            KnowledgeBase.id == knowledge_base_id,
+            KnowledgeBase.workspace_id == workspace.id,
+        )
     )
     kb = result.scalar_one_or_none()
     if not kb:
-        raise HTTPException(status_code=404, detail="Knowledge base not found")
+        raise HTTPException(status_code=404, detail="Knowledge base not found in your workspace")
     
     # Validate file extension
     ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename else ""
@@ -146,10 +152,16 @@ async def process_document(document_id: str, file_path: str):
 @router.get("", response_model=List[DocumentResponse])
 async def list_documents(
     knowledge_base_id: Optional[uuid.UUID] = None,
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    """List documents, optionally filtered by knowledge base."""
-    query = select(Document).order_by(Document.created_at.desc())
+    """List documents, optionally filtered by knowledge base, scoped to visitor's workspace."""
+    query = (
+        select(Document)
+        .join(KnowledgeBase, KnowledgeBase.id == Document.knowledge_base_id)
+        .where(KnowledgeBase.workspace_id == workspace.id)
+        .order_by(Document.created_at.desc())
+    )
     if knowledge_base_id:
         query = query.where(Document.knowledge_base_id == knowledge_base_id)
     
@@ -227,16 +239,24 @@ async def get_document_chunks(doc_id: uuid.UUID, db: AsyncSession = Depends(get_
 
 
 @router.delete("/{doc_id}", status_code=204)
-async def delete_document(doc_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+async def delete_document(
+    doc_id: uuid.UUID,
+    workspace: Workspace = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
     """Delete a document and all its chunks and citations."""
     from app.models.document_chunk import DocumentChunk
     from app.models.citation import Citation
     from sqlalchemy import delete
     
-    result = await db.execute(select(Document).where(Document.id == doc_id))
+    result = await db.execute(
+        select(Document)
+        .join(KnowledgeBase, KnowledgeBase.id == Document.knowledge_base_id)
+        .where(Document.id == doc_id, KnowledgeBase.workspace_id == workspace.id)
+    )
     doc = result.scalar_one_or_none()
     if not doc:
-        raise HTTPException(status_code=404, detail="Document not found")
+        raise HTTPException(status_code=404, detail="Document not found in your workspace")
     
     # Delete file from disk
     file_path = (doc.metadata_ or {}).get("file_path")

@@ -1,3 +1,5 @@
+import { getSessionId } from "./session";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 interface FetchOptions extends RequestInit {
@@ -34,9 +36,16 @@ class ApiClient {
     return url.toString();
   }
 
+  private getHeaders(extra?: Record<string, string>): Record<string, string> {
+    return {
+      "X-Session-ID": getSessionId(),
+      ...extra,
+    };
+  }
+
   async get<T>(path: string, params?: Record<string, string>): Promise<T> {
     const res = await fetch(this.buildUrl(path, params), {
-      headers: { "Content-Type": "application/json" },
+      headers: this.getHeaders({ "Content-Type": "application/json" }),
     });
     if (!res.ok) {
       const error = await res.json().catch(() => ({ detail: res.statusText }));
@@ -48,7 +57,7 @@ class ApiClient {
   async post<T>(path: string, body?: unknown): Promise<T> {
     const res = await fetch(this.buildUrl(path), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: this.getHeaders({ "Content-Type": "application/json" }),
       body: body ? JSON.stringify(body) : undefined,
     });
     if (!res.ok) {
@@ -61,6 +70,7 @@ class ApiClient {
   async postForm<T>(path: string, formData: FormData): Promise<T> {
     const res = await fetch(this.buildUrl(path), {
       method: "POST",
+      headers: this.getHeaders(),
       body: formData,
     });
     if (!res.ok) {
@@ -73,6 +83,7 @@ class ApiClient {
   async delete(path: string): Promise<void> {
     const res = await fetch(this.buildUrl(path), {
       method: "DELETE",
+      headers: this.getHeaders(),
     });
     if (!res.ok && res.status !== 204) {
       const error = await res.json().catch(() => ({ detail: res.statusText }));
@@ -83,7 +94,7 @@ class ApiClient {
   async put<T>(path: string, body?: unknown): Promise<T> {
     const res = await fetch(this.buildUrl(path), {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: this.getHeaders({ "Content-Type": "application/json" }),
       body: body ? JSON.stringify(body) : undefined,
     });
     if (!res.ok) {

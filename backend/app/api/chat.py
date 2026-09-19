@@ -13,6 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
+from app.core.workspace import get_current_workspace
+from app.models.workspace import Workspace
 from app.models.conversation import Conversation
 from app.models.message import Message
 from app.models.citation import Citation
@@ -30,6 +32,7 @@ router = APIRouter()
 @router.post("")
 async def chat(
     request: ChatRequest,
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -40,13 +43,16 @@ async def chat(
     """
     from app.rag.pipeline import RAGPipeline
     
-    # Validate knowledge base
+    # Validate knowledge base belongs to current workspace
     result = await db.execute(
-        select(KnowledgeBase).where(KnowledgeBase.id == request.knowledge_base_id)
+        select(KnowledgeBase).where(
+            KnowledgeBase.id == request.knowledge_base_id,
+            KnowledgeBase.workspace_id == workspace.id,
+        )
     )
     kb = result.scalar_one_or_none()
     if not kb:
-        raise HTTPException(status_code=404, detail="Knowledge base not found")
+        raise HTTPException(status_code=404, detail="Knowledge base not found in your workspace")
     
     # Get or create conversation
     if request.conversation_id:
@@ -152,10 +158,16 @@ async def chat(
 @router.get("/conversations", response_model=list[ConversationResponse])
 async def list_conversations(
     knowledge_base_id: Optional[uuid.UUID] = None,
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    """List conversations."""
-    query = select(Conversation).order_by(Conversation.updated_at.desc())
+    """List conversations scoped to visitor's workspace."""
+    query = (
+        select(Conversation)
+        .join(KnowledgeBase, KnowledgeBase.id == Conversation.knowledge_base_id)
+        .where(KnowledgeBase.workspace_id == workspace.id)
+        .order_by(Conversation.updated_at.desc())
+    )
     if knowledge_base_id:
         query = query.where(Conversation.knowledge_base_id == knowledge_base_id)
     
@@ -182,13 +194,16 @@ async def list_conversations(
 @router.get("/conversations/{conv_id}/messages", response_model=list[MessageResponse])
 async def get_conversation_messages(
     conv_id: uuid.UUID,
+    workspace: Workspace = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get all messages in a conversation with citations."""
+    """Get all messages in a conversation with citations (scoped to current workspace)."""
     result = await db.execute(
         select(Message)
+        .join(Conversation, Conversation.id == Message.conversation_id)
+        .join(KnowledgeBase, KnowledgeBase.id == Conversation.knowledge_base_id)
         .options(selectinload(Message.citations))
-        .where(Message.conversation_id == conv_id)
+        .where(Message.conversation_id == conv_id, KnowledgeBase.workspace_id == workspace.id)
         .order_by(Message.created_at)
     )
     messages = result.scalars().all()

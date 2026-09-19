@@ -23,6 +23,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import api from "@/lib/api";
+import { getSessionId } from "@/lib/session";
 import type { KnowledgeBase, Citation, RetrievalMetadata, Confidence, Document as DocType } from "@/types";
 import { formatLatency } from "@/lib/utils";
 
@@ -166,7 +167,10 @@ function ChatContent() {
     try {
       const response = await fetch(`${api.base}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Session-ID": getSessionId(),
+        },
         body: JSON.stringify({
           knowledge_base_id: selectedKb,
           conversation_id: conversationId,
