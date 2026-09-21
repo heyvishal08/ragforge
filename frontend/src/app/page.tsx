@@ -85,21 +85,21 @@ export default function LandingPage() {
   return (
     <div
       suppressHydrationWarning
-      className="min-h-screen bg-[#090a0f] text-slate-100 selection:bg-indigo-500/30 selection:text-white"
+      className="min-h-screen bg-[#090a0f] text-slate-100 selection:bg-indigo-500/30 selection:text-white overflow-x-hidden relative"
     >
       {/* Background Ambient Glow */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-indigo-600/15 via-cyan-600/5 to-transparent blur-3xl pointer-events-none -z-10" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] max-w-full h-[500px] bg-gradient-to-b from-indigo-600/15 via-cyan-600/5 to-transparent blur-3xl pointer-events-none -z-10" />
 
       {/* Navigation */}
       <header className="sticky top-0 z-40 backdrop-blur-md bg-[#090a0f]/80 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl glow-gradient flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl glow-gradient flex items-center justify-center shadow-lg shadow-indigo-500/20">
               <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-bold text-lg tracking-tight text-white">RAGForge</span>
-              <span className="block text-[11px] font-medium text-slate-400">Evidence-First AI</span>
+              <span className="font-bold text-base sm:text-lg tracking-tight text-white">RAGForge</span>
+              <span className="block text-[10px] sm:text-[11px] font-medium text-slate-400">Evidence-First AI</span>
             </div>
           </Link>
 
@@ -115,54 +115,54 @@ export default function LandingPage() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 transition-all hover:scale-105"
+              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 transition-all hover:scale-105"
             >
-              Open Dashboard
-              <ArrowRight className="w-4 h-4" />
+              <span>Dashboard</span>
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Link>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-28 px-6 max-w-5xl mx-auto text-center">
+      <section className="relative pt-16 sm:pt-24 pb-20 sm:pb-28 px-4 sm:px-6 max-w-5xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 mb-8 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 mb-6 sm:mb-8 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            Evidence-First AI Knowledge Engine
+            <span>Evidence-First AI Knowledge Engine</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1] mb-8">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.12] mb-6 sm:mb-8">
             Ask your documents.
             <br />
             <span className="gradient-text-accent">See the exact proof.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed font-normal">
+          <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed font-normal">
             A production-grade multi-document research platform with hybrid retrieval, cross-encoder
             reranking, citation tracking, and automated RAG evaluation.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
             <Link
               href="/chat"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-base font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/30 transition-all hover:scale-105"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/30 transition-all hover:scale-105"
             >
-              <Zap className="w-5 h-5" />
-              Launch Research Chat
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span>Launch Research Chat</span>
             </Link>
             <Link
               href="/dashboard"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-base font-semibold bg-white/[0.05] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] transition-all hover:scale-105"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-semibold bg-white/[0.05] hover:bg-white/[0.08] text-slate-200 border border-white/[0.1] transition-all hover:scale-105"
             >
-              Explore Dashboard
+              <span>Explore Dashboard</span>
               <ArrowRight className="w-4 h-4 text-slate-400" />
             </Link>
           </div>

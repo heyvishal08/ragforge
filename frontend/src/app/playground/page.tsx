@@ -128,10 +128,13 @@ export default function PlaygroundPage() {
 
       {/* Comparison Grid */}
       <div
-        className="grid gap-6 items-start"
-        style={{
-          gridTemplateColumns: `repeat(${Math.max(1, selectedStrategies.length)}, minmax(0, 1fr))`,
-        }}
+        className={`grid gap-6 items-start grid-cols-1 ${
+          selectedStrategies.length === 2
+            ? "md:grid-cols-2"
+            : selectedStrategies.length >= 3
+            ? "md:grid-cols-2 xl:grid-cols-3"
+            : ""
+        }`}
       >
         {selectedStrategies.map((strategyId) => {
           const strat = strategies.find((s) => s.id === strategyId);

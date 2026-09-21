@@ -159,11 +159,11 @@ function DocumentsContent() {
         </div>
 
         {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
           <select
             value={selectedKb}
             onChange={(e) => setSelectedKb(e.target.value)}
-            className="px-3.5 py-2.5 rounded-xl text-sm font-medium bg-[#141724] border border-white/[0.08] text-slate-200 outline-none focus:border-indigo-500/50"
+            className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl text-sm font-medium bg-[#141724] border border-white/[0.08] text-slate-200 outline-none focus:border-indigo-500/50"
           >
             <option value="">All Knowledge Bases</option>
             {knowledgeBases.map((kb) => (
@@ -176,14 +176,14 @@ function DocumentsContent() {
           {knowledgeBases.length === 0 ? (
             <a
               href="/knowledge-bases"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all hover:scale-105"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all hover:scale-105"
             >
               <Plus className="w-4 h-4" />
               <span>Create Knowledge Base</span>
             </a>
           ) : (
             <label
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer shadow-md transition-all ${
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer shadow-md transition-all ${
                 uploading
                   ? "bg-indigo-700/60 text-slate-300 cursor-wait"
                   : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20 hover:scale-105"
@@ -209,7 +209,7 @@ function DocumentsContent() {
       </div>
 
       {/* Search Bar */}
-      <div className="relative max-w-md">
+      <div className="relative max-w-md w-full">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
@@ -221,9 +221,9 @@ function DocumentsContent() {
       </div>
 
       {/* Document Content Split Layout */}
-      <div className="flex gap-8 items-start">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
         {/* Document Cards List */}
-        <div className={selectedDoc ? "w-1/2" : "w-full"}>
+        <div className={selectedDoc ? "w-full lg:w-1/2" : "w-full"}>
           {loading ? (
             <div className="flex items-center justify-center py-20 text-slate-400">
               <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
@@ -325,7 +325,7 @@ function DocumentsContent() {
 
         {/* Side Chunk Inspector Panel */}
         {selectedDoc && (
-          <div className="w-1/2 glass-panel p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/90 sticky top-6 max-h-[calc(100vh-12rem)] flex flex-col">
+          <div className="w-full lg:w-1/2 glass-panel p-4 sm:p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/90 lg:sticky lg:top-6 max-h-[85vh] lg:max-h-[calc(100vh-12rem)] flex flex-col">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/[0.06] shrink-0">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-indigo-400" />

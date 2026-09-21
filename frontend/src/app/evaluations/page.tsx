@@ -80,27 +80,27 @@ export default function EvaluationsPage() {
       </div>
 
       {/* 6 Metric KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {metricCards.map((m) => (
           <div
             key={m.label}
-            className="glass-panel p-5 rounded-2xl border border-white/[0.06] bg-[#141724]/70 text-center flex flex-col justify-between"
+            className="glass-panel p-3.5 sm:p-5 rounded-2xl border border-white/[0.06] bg-[#141724]/70 text-center flex flex-col justify-between"
           >
-            <div className={`text-2xl md:text-3xl font-extrabold ${m.color} tracking-tight mb-1`}>
+            <div className={`text-xl sm:text-2xl md:text-3xl font-extrabold ${m.color} tracking-tight mb-1`}>
               {m.value}
             </div>
             <div>
-              <div className="text-xs font-bold text-white mb-0.5">{m.label}</div>
-              <div className="text-[10px] text-slate-400">{m.desc}</div>
+              <div className="text-[11px] sm:text-xs font-bold text-white mb-0.5">{m.label}</div>
+              <div className="text-[9px] sm:text-[10px] text-slate-400">{m.desc}</div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Radar Quality Graph + Run Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* Radar Chart Column */}
-        <div className="lg:col-span-7 glass-panel p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/70">
+        <div className="lg:col-span-7 glass-panel p-4 sm:p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/70">
           <div className="flex items-center justify-between mb-6 pb-3 border-b border-white/[0.06]">
             <div className="flex items-center gap-2">
               <FlaskConical className="w-5 h-5 text-indigo-400" />

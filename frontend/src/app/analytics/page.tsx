@@ -69,7 +69,7 @@ export default function AnalyticsPage() {
 
       {/* 4 KPI Summary Cards */}
       {analytics && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {[
             {
               label: "Total Queries Run",
@@ -99,19 +99,21 @@ export default function AnalyticsPage() {
               color: "text-cyan-400",
               bg: "bg-cyan-500/10 border-cyan-500/20",
             },
-          ].map((stat) => (
+          ].map((item) => (
             <div
-              key={stat.label}
-              className="glass-panel p-5 rounded-2xl border border-white/[0.06] bg-[#141724]/70"
+              key={item.label}
+              className="glass-panel p-5 rounded-2xl border border-white/[0.06] bg-[#141724]/70 flex items-center gap-4"
             >
-              <div className="flex items-center gap-2 mb-3">
-                <div className={`w-8 h-8 rounded-lg border flex items-center justify-center ${stat.bg}`}>
-                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                </div>
-                <span className="text-xs font-semibold text-slate-400">{stat.label}</span>
+              <div
+                className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 ${item.bg}`}
+              >
+                <item.icon className={`w-6 h-6 ${item.color}`} />
               </div>
-              <div className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                {stat.value}
+              <div className="min-w-0">
+                <div className="text-2xl font-extrabold text-white tracking-tight truncate">
+                  {item.value}
+                </div>
+                <div className="text-xs font-semibold text-slate-400 truncate">{item.label}</div>
               </div>
             </div>
           ))}
@@ -119,7 +121,7 @@ export default function AnalyticsPage() {
       )}
 
       {/* Stacked Latency Chart Card */}
-      <div className="glass-panel p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/70 space-y-4">
+      <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/70 space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
           <div>
             <h3 className="text-base font-bold text-white tracking-tight">
@@ -157,9 +159,9 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Query Logs Table and Detail View */}
-      <div className="flex gap-8 items-start">
-        <div className={selectedQuery ? "w-1/2" : "w-full"}>
-          <div className="glass-panel p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/70">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+        <div className={selectedQuery ? "w-full lg:w-1/2" : "w-full"}>
+          <div className="glass-panel p-4 sm:p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/70">
             <h3 className="text-base font-bold text-white tracking-tight mb-4 pb-3 border-b border-white/[0.06]">
               Query Execution Logs
             </h3>
@@ -202,7 +204,7 @@ export default function AnalyticsPage() {
 
         {/* Selected Query Inspector */}
         {selectedQuery && (
-          <div className="w-1/2 glass-panel p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/90 sticky top-6 space-y-4">
+          <div className="w-full lg:w-1/2 glass-panel p-4 sm:p-6 rounded-2xl border border-white/[0.06] bg-[#141724]/90 lg:sticky lg:top-6 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
               <h3 className="text-base font-bold text-white tracking-tight">Query Detail</h3>
               <button

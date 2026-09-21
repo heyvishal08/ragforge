@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   Database,
@@ -14,6 +13,7 @@ import {
   Settings,
   Zap,
   Sparkles,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,15 +28,20 @@ const navItems = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
 
-  return (
-    <aside className="w-64 shrink-0 h-screen sticky top-0 flex flex-col bg-[#0c0e17] border-r border-white/[0.07] z-30 select-none">
+  const navContent = (
+    <>
       {/* Brand Header */}
-      <div className="h-20 flex items-center px-6 border-b border-white/[0.06] shrink-0">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl glow-gradient flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+      <div className="h-16 md:h-20 flex items-center justify-between px-6 border-b border-white/[0.06] shrink-0">
+        <Link href="/" onClick={onClose} className="flex items-center gap-3 group">
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl glow-gradient flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -49,6 +54,15 @@ export default function Sidebar() {
             <div className="text-[11px] font-medium text-slate-400">Evidence-First AI</div>
           </div>
         </Link>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+            aria-label="Close navigation"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Nav List */}
@@ -63,6 +77,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={cn(
                 "flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative",
                 isActive
@@ -100,6 +115,30 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Persistent Sidebar */}
+      <aside className="hidden md:flex w-64 shrink-0 h-screen sticky top-0 flex-col bg-[#0c0e17] border-r border-white/[0.07] z-30 select-none">
+        {navContent}
+      </aside>
+
+      {/* Mobile Drawer */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop */}
+          <div
+            onClick={onClose}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+          />
+          {/* Slide-in Drawer */}
+          <aside className="fixed inset-y-0 left-0 w-72 max-w-[85vw] flex flex-col bg-[#0c0e17] border-r border-white/[0.08] shadow-2xl z-10 select-none">
+            {navContent}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }
